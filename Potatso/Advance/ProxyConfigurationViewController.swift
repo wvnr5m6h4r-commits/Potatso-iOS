@@ -174,7 +174,7 @@ class ProxyConfigurationViewController: FormViewController {
             guard let type = values[kProxyFormType] as? ProxyType else {
                 throw "You must choose a proxy type".localized()
             }
-            guard let name = (values[kProxyFormName] as? String)?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet()) where name.characters.count > 0 else {
+            guard let name = (values[kProxyFormName] as? String)?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet()) where name.count > 0 else {
                 throw "Name can't be empty".localized()
             }
             if !self.isEdit {
@@ -182,7 +182,7 @@ class ProxyConfigurationViewController: FormViewController {
                     throw "Name already exists".localized()
                 }
             }
-            guard let host = (values[kProxyFormHost] as? String)?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet()) where host.characters.count > 0 else {
+            guard let host = (values[kProxyFormHost] as? String)?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet()) where host.count > 0 else {
                 throw "Host can't be empty".localized()
             }
             guard let port = values[kProxyFormPort] as? Int else {
@@ -196,10 +196,10 @@ class ProxyConfigurationViewController: FormViewController {
             var password: String?
             switch type {
             case .Shadowsocks, .ShadowsocksR:
-                guard let encryption = values[kProxyFormEncryption] as? String where encryption.characters.count > 0 else {
+                guard let encryption = values[kProxyFormEncryption] as? String where encryption.count > 0 else {
                     throw "You must choose a encryption method".localized()
                 }
-                guard let pass = values[kProxyFormPassword] as? String where pass.characters.count > 0 else {
+                guard let pass = values[kProxyFormPassword] as? String where pass.count > 0 else {
                     throw "Password can't be empty".localized()
                 }
                 authscheme = encryption

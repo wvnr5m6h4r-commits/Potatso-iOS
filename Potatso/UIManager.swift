@@ -14,7 +14,7 @@ import Aspects
 class UIManager: NSObject, AppLifeCycleProtocol {
     
     var keyWindow: UIWindow? {
-        return UIApplication.sharedApplication().keyWindow
+        return UIApplication.shared.keyWindow
     }
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {

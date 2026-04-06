@@ -86,7 +86,7 @@ extension RuleAction: CustomStringConvertible {
     
 }
 
-public enum RuleError: ErrorType {
+public enum RuleError: Error {
     case InvalidRule(String)
 }
 
@@ -143,16 +143,16 @@ public final class Rule {
     public var action: RuleAction
     
     public convenience init(str: String) throws {
-        var ruleStr = str.stringByReplacingOccurrencesOfString("\t", withString: "")
-        ruleStr = ruleStr.stringByReplacingOccurrencesOfString(" ", withString: "")
-        let parts = ruleStr.componentsSeparatedByString(",")
+        var ruleStr = str.replacingOccurrences(of: "\t", with: "")
+        ruleStr = ruleStr.replacingOccurrences(of: " ", with: "")
+        let parts = ruleStr.components(separatedBy: ",")
         guard parts.count >= 3 else {
             throw RuleError.InvalidRule(str)
         }
-        let actionStr = parts[2].uppercaseString
-        let typeStr = parts[0].uppercaseString
+        let actionStr = parts[2].uppercased()
+        let typeStr = parts[0].uppercased()
         let value = parts[1]
-        guard let type = RuleType(rawValue: typeStr), action = RuleAction(rawValue: actionStr) where value.characters.count > 0 else {
+        guard let type = RuleType(rawValue: typeStr), let action = RuleAction(rawValue: actionStr), value.count > 0 else {
             throw RuleError.InvalidRule(str)
         }
         self.init(type: type, action: action, value: value)
@@ -164,11 +164,11 @@ public final class Rule {
         self.action = action
     }
 
-    public convenience init?(json: [String: AnyObject]) {
-        guard let typeRaw = json["type"] as? String, type = RuleType(rawValue: typeRaw) else {
+    public convenience init?(json: [String: Any]) {
+        guard let typeRaw = json["type"] as? String, let type = RuleType(rawValue: typeRaw) else {
             return nil
         }
-        guard let actionRaw = json["action"] as? String, action = RuleAction(rawValue: actionRaw) else {
+        guard let actionRaw = json["action"] as? String, let action = RuleAction(rawValue: actionRaw) else {
             return nil
         }
         guard let value = json["value"] as? String else {
@@ -181,7 +181,7 @@ public final class Rule {
         return "\(type), \(value), \(action)"
     }
 
-    public var json: [String: AnyObject] {
+    public var json: [String: Any] {
         return ["type": type.rawValue, "value": value, "action": action.rawValue]
     }
 }

@@ -145,7 +145,7 @@ class RecentRequestsViewController: UIViewController, UITableViewDataSource, UIT
     lazy var hintLabel: UILabel = {
         let v = UILabel()
         v.text = "Potatso is not connected".localized()
-        v.textColor = UIColor.whiteColor()
+        v.textColor = UIColor.white
         v.backgroundColor = "E74C3C".color
         v.textAlignment = .Center
         v.font = UIFont.systemFontOfSize(14)

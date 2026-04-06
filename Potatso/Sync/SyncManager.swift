@@ -15,8 +15,8 @@ public enum SyncServiceType: String {
 }
 
 public protocol SyncServiceProtocol {
-    func setup(completion: (ErrorType? -> Void)?)
-    func sync(manually: Bool, completion: (ErrorType? -> Void)?)
+    func setup(completion: ((Error?) -> Void)?)
+    func sync(manually: Bool, completion: ((Error?) -> Void)?)
     func stop()
 }
 
@@ -71,7 +71,7 @@ public class SyncManager {
     }
 
     func showSyncVC(inVC vc:UIViewController? = nil) {
-        guard let currentVC = vc ?? UIApplication.sharedApplication().keyWindow?.rootViewController else {
+        guard let currentVC = vc ?? UIApplication.shared.keyWindow?.rootViewController else {
             return
         }
         let syncVC = SyncVC()
@@ -82,7 +82,7 @@ public class SyncManager {
 
 extension SyncManager {
 
-    func setupNewService(type: SyncServiceType, completion: (ErrorType? -> Void)?) {
+    func setupNewService(type: SyncServiceType, completion: ((Error?) -> Void)?) {
         if let service = getSyncService(forType: type) {
             service.setup(completion)
         } else {
@@ -90,11 +90,11 @@ extension SyncManager {
         }
     }
 
-    func setup(completion: (ErrorType? -> Void)?) {
+    func setup(completion: ((Error?) -> Void)?) {
         getCurrentSyncService()?.setup(completion)
     }
 
-    func sync(manually: Bool = false, completion: (ErrorType? -> Void)? = nil) {
+    func sync(manually: Bool = false, completion: ((Error?) -> Void)? = nil) {
         if let service = getCurrentSyncService() {
             syncing = true
             NSNotificationCenter.defaultCenter().postNotificationName(SyncManager.syncServiceChangedNotification, object: nil)

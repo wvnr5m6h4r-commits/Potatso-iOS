@@ -14,7 +14,7 @@ import NetworkExtension
 import ICSMainFramework
 import MMWormhole
 
-public enum ManagerError: ErrorType {
+public enum ManagerError: Error {
     case InvalidProvider
     case VPNStartFail
 }
@@ -90,7 +90,7 @@ public class Manager {
         }
     }
 
-    public func switchVPN(completion: ((NETunnelProviderManager?, ErrorType?) -> Void)? = nil) {
+    public func switchVPN(completion: ((NETunnelProviderManager?, Error?) -> Void)? = nil) {
         loadProviderManager { [unowned self] (manager) in
             if let manager = manager {
                 self.updateVPNStatus(manager)
@@ -314,7 +314,7 @@ extension Manager {
         mainConf["debug"] = mainConf["debug"] as! Int + 4096
         mainConf["actionsfile"] = userActionUrl.path!
 
-        let mainContent = mainConf.map { "\($0) \($1)"}.joinWithSeparator("\n")
+        let mainContent = mainConf.map { "\($0) \($1)"}.joined(separator:"\n")
         try mainContent.writeToURL(Potatso.sharedHttpProxyConfUrl(), atomically: true, encoding: NSUTF8StringEncoding)
 
         var actionContent: [String] = []
@@ -336,24 +336,24 @@ extension Manager {
 
         if forwardURLRules.count > 0 {
             actionContent.append("{+forward-rule}")
-            actionContent.appendContentsOf(forwardURLRules)
+            actionContent.append(contentsOf: forwardURLRules)
         }
 
         if forwardIPRules.count > 0 {
             actionContent.append("{+forward-rule}")
-            actionContent.appendContentsOf(forwardIPRules)
+            actionContent.append(contentsOf: forwardIPRules)
         }
 
         if forwardGEOIPRules.count > 0 {
             actionContent.append("{+forward-rule}")
-            actionContent.appendContentsOf(forwardGEOIPRules)
+            actionContent.append(contentsOf: forwardGEOIPRules)
         }
 
         // DNS pollution
         actionContent.append("{+forward-rule}")
-        actionContent.appendContentsOf(Pollution.dnsList.map({ "DNS-IP-CIDR, \($0)/32, PROXY" }))
+        actionContent.append(contentsOf: Pollution.dnsList.map({ "DNS-IP-CIDR, \($0)/32, PROXY" }))
 
-        let userActionString = actionContent.joinWithSeparator("\n")
+        let userActionString = actionContent.joined(separator:"\n")
         try userActionString.writeToFile(userActionUrl.path!, atomically: true, encoding: NSUTF8StringEncoding)
     }
 
@@ -371,11 +371,11 @@ extension Manager {
         }
     }
     
-    public func startVPN(complete: ((NETunnelProviderManager?, ErrorType?) -> Void)? = nil) {
+    public func startVPN(complete: ((NETunnelProviderManager?, Error?) -> Void)? = nil) {
         startVPNWithOptions(nil, complete: complete)
     }
     
-    private func startVPNWithOptions(options: [String : NSObject]?, complete: ((NETunnelProviderManager?, ErrorType?) -> Void)? = nil) {
+    private func startVPNWithOptions(options: [String : NSObject]?, complete: ((NETunnelProviderManager?, Error?) -> Void)? = nil) {
         // regenerate config files
         do {
             try Manager.sharedManager.regenerateConfigFiles()
@@ -435,7 +435,7 @@ extension Manager {
         }
     }
     
-    private func loadAndCreateProviderManager(complete: (NETunnelProviderManager?, ErrorType?) -> Void ) {
+    private func loadAndCreateProviderManager(complete: (NETunnelProviderManager?, Error?) -> Void ) {
         NETunnelProviderManager.loadAllFromPreferencesWithCompletionHandler { [unowned self] (managers, error) -> Void in
             if let managers = managers {
                 let manager: NETunnelProviderManager

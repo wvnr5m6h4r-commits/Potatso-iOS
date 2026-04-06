@@ -9,15 +9,13 @@
 import Foundation
 
 @objc public protocol AppLifeCycleProtocol: UIApplicationDelegate {
-    
 }
 
-
 public struct AppLifeCycleItem {
-    
+
     public var object: AppLifeCycleProtocol?
-    
-    init?(dictionary: [String: AnyObject]) {
+
+    init?(dictionary: [String: Any]) {
         if let objectString = dictionary["object"] as? String {
             object = OBJCObjectFactory.create(objectString) as? AppLifeCycleProtocol
         }
@@ -25,5 +23,4 @@ public struct AppLifeCycleItem {
             return nil
         }
     }
-    
 }

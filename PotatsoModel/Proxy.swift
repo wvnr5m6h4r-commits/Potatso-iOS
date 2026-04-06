@@ -29,7 +29,7 @@ extension ProxyType: CustomStringConvertible {
     
 }
 
-public enum ProxyError: ErrorType {
+public enum ProxyError: Error {
     case InvalidType
     case InvalidName
     case InvalidHost
@@ -125,10 +125,10 @@ public class Proxy: BaseModel {
         guard let _ = ProxyType(rawValue: typeRaw)else {
             throw ProxyError.InvalidType
         }
-        guard name.characters.count > 0 else{
+        guard name.count > 0 else{
             throw ProxyError.InvalidName
         }
-        guard host.characters.count > 0 else {
+        guard host.count > 0 else {
             throw ProxyError.InvalidHost
         }
         guard port > 0 && port <= Int(UINT16_MAX) else {
@@ -194,7 +194,7 @@ extension Proxy {
             self.name = name
             if uriString.lowercaseString.hasPrefix(Proxy.ssUriPrefix) {
                 // Shadowsocks
-                let undecodedString = uriString.substringFromIndex(uriString.startIndex.advancedBy(Proxy.ssUriPrefix.characters.count))
+                let undecodedString = uriString.substringFromIndex(uriString.startIndex.advancedBy(Proxy.ssUriPrefix.count))
                 guard let proxyString = base64DecodeIfNeeded(undecodedString), _ = proxyString.rangeOfString(":")?.startIndex else {
                     throw ProxyError.InvalidUri
                 }
@@ -219,7 +219,7 @@ extension Proxy {
                 self.port = p
                 self.type = .Shadowsocks
             }else if uriString.lowercaseString.hasPrefix(Proxy.ssrUriPrefix) {
-                let undecodedString = uriString.substringFromIndex(uriString.startIndex.advancedBy(Proxy.ssrUriPrefix.characters.count))
+                let undecodedString = uriString.substringFromIndex(uriString.startIndex.advancedBy(Proxy.ssrUriPrefix.count))
                 guard let proxyString = base64DecodeIfNeeded(undecodedString), _ = proxyString.rangeOfString(":")?.startIndex else {
                     throw ProxyError.InvalidUri
                 }
@@ -291,7 +291,7 @@ extension Proxy {
             self.type = type
         }
         if realm.objects(Proxy).filter("name = '\(name)'").first != nil {
-            self.name = "\(name) \(Proxy.dateFormatter.stringFromDate(NSDate()))"
+            self.name = "\(name) \(Proxy.dateFormatter.string(from: Date()))"
         }
         try validate(inRealm: realm)
     }
@@ -301,7 +301,7 @@ extension Proxy {
             return proxyString
         }
         let base64String = proxyString.stringByReplacingOccurrencesOfString("-", withString: "+").stringByReplacingOccurrencesOfString("_", withString: "/")
-        let padding = base64String.characters.count + (base64String.characters.count % 4 != 0 ? (4 - base64String.characters.count % 4) : 0)
+        let padding = base64String.count + (base64String.count % 4 != 0 ? (4 - base64String.count % 4) : 0)
         if let decodedData = NSData(base64EncodedString: base64String.stringByPaddingToLength(padding, withString: "=", startingAtIndex: 0), options: NSDataBase64DecodingOptions(rawValue: 0)), decodedString = NSString(data: decodedData, encoding: NSUTF8StringEncoding) {
             return decodedString as String
         }

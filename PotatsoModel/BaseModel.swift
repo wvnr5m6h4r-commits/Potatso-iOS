@@ -17,8 +17,8 @@ public func setupDefaultReaml() {
     var config = Realm.Configuration()
     let sharedURL = Potatso.sharedDatabaseUrl()
     if let originPath = config.fileURL?.path {
-        if NSFileManager.defaultManager().fileExistsAtPath(originPath) {
-            _ = try? NSFileManager.defaultManager().moveItemAtPath(originPath, toPath: sharedURL.path!)
+        if FileManager.default.fileExists(atPath: originPath) {
+            _ = try? FileManager.default.moveItem(atPath: originPath, toPath: sharedURL.path!)
         }
     }
     config.fileURL = sharedURL
@@ -35,9 +35,9 @@ public func setupDefaultReaml() {
 
 
 public class BaseModel: Object {
-    public dynamic var uuid = NSUUID().UUIDString
-    public dynamic var createAt = NSDate().timeIntervalSince1970
-    public dynamic var updatedAt = NSDate().timeIntervalSince1970
+    public dynamic var uuid = UUID().uuidString
+    public dynamic var createAt = Date().timeIntervalSince1970
+    public dynamic var updatedAt = Date().timeIntervalSince1970
     public dynamic var deleted = false
     public dynamic var synced = false
 
@@ -45,8 +45,8 @@ public class BaseModel: Object {
         return "uuid"
     }
     
-    static var dateFormatter: NSDateFormatter {
-        let f = NSDateFormatter()
+    static var dateFormatter: DateFormatter {
+        let f = DateFormatter()
         f.dateFormat = "MM-dd HH:mm:ss"
         return f
     }
@@ -59,23 +59,23 @@ public class BaseModel: Object {
 
 // MARK: - Migration
 func migrateRulesList(migration: Migration, oldSchemaVersion: UInt64) {
-    migration.enumerate(RuleSet.className(), { (oldObject, newObject) in
+    migration.enumerateObjects(ofType: RuleSet.className(), { (oldObject, newObject) in
         if oldSchemaVersion > 11 {
-            guard let deleted = oldObject!["deleted"] as? Bool where !deleted else {
+            guard let deleted = oldObject!["deleted"] as? Bool, !deleted else {
                 return
             }
         }
         guard let rules = oldObject!["rules"] as? List<DynamicObject> else {
             return
         }
-        var rulesJSONArray: [[NSObject: AnyObject]] = []
+        var rulesJSONArray: [[String: Any]] = []
         for rule in rules {
             if oldSchemaVersion > 11 {
-                guard let deleted = rule["deleted"] as? Bool where !deleted else {
+                guard let deleted = rule["deleted"] as? Bool, !deleted else {
                     return
                 }
             }
-            guard let typeRaw = rule["typeRaw"]as? String, contentJSONString = rule["content"] as? String, contentJSON = contentJSONString.jsonDictionary() else {
+            guard let typeRaw = rule["typeRaw"] as? String, let contentJSONString = rule["content"] as? String, let contentJSON = contentJSONString.jsonDictionary() else {
                 return
             }
             var ruleJSON = contentJSON

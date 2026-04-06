@@ -135,7 +135,7 @@ class RuleSetListViewController: UIViewController, UITableViewDataSource, UITabl
 
     override func loadView() {
         super.loadView()
-        view.backgroundColor = UIColor.clearColor()
+        view.backgroundColor = UIColor.clear
         view.addSubview(tableView)
         tableView.registerClass(RuleSetCell.self, forCellReuseIdentifier: kRuleSetCellIdentifier)
 

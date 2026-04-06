@@ -77,7 +77,7 @@ class Receipt: NSObject, SKRequestDelegate {
 
     private func failAndTerminate() {
 //        dispatch_async(dispatch_get_main_queue()) { 
-//            guard let vc = UIApplication.sharedApplication().keyWindow?.rootViewController else {
+//            guard let vc = UIApplication.shared.keyWindow?.rootViewController else {
 //                return
 //            }
 //            Alert.show(vc, title: "Receipt Validation Error".localized(), message: "The app is only made for App Store users. Please try again.".localized(), confirmMessage: "CANCEL".localized(), confirmCallback: {

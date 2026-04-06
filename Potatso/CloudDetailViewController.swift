@@ -7,7 +7,9 @@
 //
 
 import Foundation
+import UIKit
 import PotatsoModel
+import PotatsoBase
 import Cartography
 
 private let rowHeight: CGFloat = 54
@@ -22,7 +24,7 @@ class CloudDetailViewController: UIViewController, UITableViewDataSource, UITabl
         self.ruleSet = ruleSet
         super.init(nibName: nil, bundle: nil)
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -32,71 +34,68 @@ class CloudDetailViewController: UIViewController, UITableViewDataSource, UITabl
         navigationItem.title = "Detail".localized()
         loadData()
         if isExist(ruleSet.uuid) {
-            subscribeButton.setTitle("Unsubscribe".localized(), forState: .Normal)
+            subscribeButton.setTitle("Unsubscribe".localized(), for: .normal)
             subscribeButton.backgroundColor = "FF5E3B".color
-        }else {
-            subscribeButton.setTitle("Subscribe".localized(), forState: .Normal)
+        } else {
+            subscribeButton.setTitle("Subscribe".localized(), for: .normal)
             subscribeButton.backgroundColor = "1E96E2".color
         }
     }
 
     func loadData() {
         activityIndicator.startAnimating()
-        activityIndicator.hidden = false
-        subscribeButton.hidden = true
-        API.getRuleSetDetail(ruleSet.uuid) { (response) in
+        activityIndicator.isHidden = false
+        subscribeButton.isHidden = true
+        API.getRuleSetDetail(uuid: ruleSet.uuid) { result in
             defer {
                 self.activityIndicator.stopAnimating()
             }
-            if response.result.isFailure {
-                // Fail
-                let errDesc = response.result.error?.localizedDescription ?? ""
-                self.showTextHUD((errDesc.characters.count > 0 ? "\(errDesc)" : "Unkown error".localized()), dismissAfterDelay: 1.5)
-            }else {
-                guard let result = response.result.value else {
-                    return
-                }
-                self.ruleSet = result
+            switch result {
+            case .failure(let error):
+                let errDesc = error.localizedDescription
+                self.showTextHUD(errDesc.isEmpty ? "Unkown error".localized() : errDesc, dismissAfterDelay: 1.5)
+            case .success(let value):
+                self.ruleSet = value
                 self.tableView.reloadData()
-                self.subscribeButton.hidden = false
+                self.subscribeButton.isHidden = false
             }
         }
     }
 
     func isExist(uuid: String) -> Bool {
-        return defaultRealm.objects(RuleSet).filter("uuid == '\(uuid)' && deleted == false").count > 0
+        return defaultRealm.objects(RuleSet.self).filter("uuid == '\(uuid)' && deleted == false").count > 0
     }
 
-    func subscribe() {
+    @objc func subscribe() {
         let uuid = ruleSet.uuid
-        if isExist(uuid) {
+        if isExist(uuid: uuid) {
             do {
                 try DBUtils.softDelete([uuid], type: RuleSet.self)
-            }catch {
+            } catch {
                 self.showTextHUD("Fail to unsubscribe".localized(), dismissAfterDelay: 1.0)
                 return
             }
-        }else {
+        } else {
             do {
-                try RuleSet.addRemoteObject(ruleSet)
-            }catch {
+                try RuleSet.addRemoteObject(ruleset: ruleSet)
+            } catch {
                 self.showTextHUD("Fail to subscribe".localized(), dismissAfterDelay: 1.0)
                 return
             }
         }
         Alert.show(self, message: "Success".localized()) { [weak self] in
-            self?.navigationController?.popViewControllerAnimated(true)
+            self?.navigationController?.popViewController(animated: true)
         }
     }
 
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         if ruleSet.rules.count > 0 {
             return 2
         }
         return 1
     }
 
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
         case 0:
             return 1
@@ -107,26 +106,26 @@ class CloudDetailViewController: UIViewController, UITableViewDataSource, UITabl
         }
     }
 
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: UITableViewCell
         switch indexPath.section {
         case 0:
-            cell = tableView.dequeueReusableCellWithIdentifier(kRuleSetCellIdentifier, forIndexPath: indexPath)
+            cell = tableView.dequeueReusableCell(withIdentifier: kRuleSetCellIdentifier, for: indexPath)
             (cell as? RuleSetCell)?.setRuleSet(ruleSet, showFullDescription: true)
         case 1:
-            cell = tableView.dequeueReusableCellWithIdentifier(kRuleCellIdentifier, forIndexPath: indexPath)
+            cell = tableView.dequeueReusableCell(withIdentifier: kRuleCellIdentifier, for: indexPath)
             (cell as? RuleCell)?.setRule(ruleSet.rules[indexPath.row])
         default:
             fatalError()
         }
-        cell.selectionStyle = .None
+        cell.selectionStyle = .none
         cell.preservesSuperviewLayoutMargins = false
-        cell.layoutMargins = UIEdgeInsetsZero
-        cell.separatorInset = UIEdgeInsetsZero
+        cell.layoutMargins = .zero
+        cell.separatorInset = .zero
         return cell
     }
 
-    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch section {
         case 1:
             return "Rules".localized()
@@ -135,27 +134,27 @@ class CloudDetailViewController: UIViewController, UITableViewDataSource, UITabl
         }
     }
 
-    func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         switch section {
         case 0:
             return 0.01
         default:
-            return UITableViewAutomaticDimension
+            return UITableView.automaticDimension
         }
     }
 
     override func loadView() {
         super.loadView()
-        view.backgroundColor = UIColor.clearColor()
+        view.backgroundColor = UIColor.clear
         view.addSubview(tableView)
-        tableView.registerClass(RuleSetCell.self, forCellReuseIdentifier: kRuleSetCellIdentifier)
-        tableView.registerClass(RuleCell.self, forCellReuseIdentifier: kRuleCellIdentifier)
+        tableView.register(RuleSetCell.self, forCellReuseIdentifier: kRuleSetCellIdentifier)
+        tableView.register(RuleCell.self, forCellReuseIdentifier: kRuleCellIdentifier)
         view.addSubview(activityIndicator)
         view.addSubview(subscribeButton)
 
         let buttonHeight: CGFloat = 49
 
-        constrain(tableView, activityIndicator, subscribeButton, view) { tableView, activityIndicator, subscribeButton,  view in
+        constrain(tableView, activityIndicator, subscribeButton, view) { tableView, activityIndicator, subscribeButton, view in
             tableView.edges == inset(view.edges, 0, 0, buttonHeight, 0)
             activityIndicator.center == view.center
             subscribeButton.leading == view.leading
@@ -166,27 +165,27 @@ class CloudDetailViewController: UIViewController, UITableViewDataSource, UITabl
     }
 
     lazy var tableView: UITableView = {
-        let v = UITableView(frame: CGRect.zero, style: .Grouped)
+        let v = UITableView(frame: CGRect.zero, style: .grouped)
         v.dataSource = self
         v.delegate = self
         v.tableFooterView = UIView()
         v.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 1, height: 0.01))
-        v.separatorStyle = .SingleLine
-        v.rowHeight = UITableViewAutomaticDimension
+        v.separatorStyle = .singleLine
+        v.rowHeight = UITableView.automaticDimension
         v.estimatedRowHeight = rowHeight
         return v
     }()
 
     lazy var activityIndicator: UIActivityIndicatorView = {
-        let v = UIActivityIndicatorView(activityIndicatorStyle: .Gray)
+        let v = UIActivityIndicatorView(style: .medium)
         v.hidesWhenStopped = true
         return v
     }()
 
     lazy var subscribeButton: UIButton = {
         let v = UIButton(frame: CGRect.zero)
-        v.addTarget(self, action: #selector(subscribe), forControlEvents: .TouchUpInside)
-        v.setTitleColor(UIColor.whiteColor(), forState: .Normal)
+        v.addTarget(self, action: #selector(subscribe), for: .touchUpInside)
+        v.setTitleColor(UIColor.white, for: .normal)
         return v
     }()
 

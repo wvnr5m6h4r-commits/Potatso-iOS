@@ -117,7 +117,7 @@ class RuleSetConfigurationViewController: FormViewController {
     func save() {
         do {
             let values = form.values()
-            guard let name = (values[kRuleSetFormName] as? String)?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet()) where name.characters.count > 0 else {
+            guard let name = (values[kRuleSetFormName] as? String)?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet()) where name.count > 0 else {
                 throw "Name can't be empty".localized()
             }
             ruleSet.name = name

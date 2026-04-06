@@ -66,7 +66,7 @@ enum URLAction: String {
     case SWITCH = "switch"
     case XCALLBACK = "x-callback-url"
 
-    func perform(url: NSURL?, parameters: Parameters, completion: (ErrorType? -> Void)? = nil) -> Bool {
+    func perform(url: NSURL?, parameters: Parameters, completion: ((Error?) -> Void)? = nil) -> Bool {
         switch self {
         case .ON:
             Manager.sharedManager.startVPN({ (manager, error) in
@@ -101,7 +101,7 @@ enum URLAction: String {
         }
         if autoclose {
             Async.main(after: 1, block: {
-                UIControl().sendAction("suspend", to: UIApplication.sharedApplication(), forEvent: nil)
+                UIControl().sendAction("suspend", to: UIApplication.shared, forEvent: nil)
             })
         }
     }

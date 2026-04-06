@@ -43,7 +43,7 @@ class FlatButton: UIButton {
     lazy var indicator: ICDMaterialActivityIndicatorView = {
         let v = ICDMaterialActivityIndicatorView(activityIndicatorStyle: ICDMaterialActivityIndicatorViewStyleSmall)
         v.hidesWhenStopped = true
-        v.color = UIColor.whiteColor()
+        v.color = UIColor.white
         return v
     }()
     

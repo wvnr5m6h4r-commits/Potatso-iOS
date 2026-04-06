@@ -7,15 +7,15 @@
 //
 
 import Foundation
+import CocoaLumberjack
 
-extension ErrorType {
+extension Error {
 
     func log(message: String?) {
         if let message = message {
             DDLogError("\(message): \(self)")
-        }else {
+        } else {
             DDLogError("\(self)")
         }
     }
-
 }

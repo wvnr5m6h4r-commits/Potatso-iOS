@@ -12,8 +12,8 @@ class GenStrings {
 
     let localizedRegex = "(?<=\")([^\"]*)(?=\".(localized|localizedFormat))|(?<=(Localized|NSLocalizedString)\\(\")([^\"]*?)(?=\")"
 
-    enum GenstringsError:ErrorType {
-        case Error
+    enum GenstringsError: Swift.Error {
+        case failed
     }
     
     // Performs the genstrings functionality
@@ -30,7 +30,7 @@ class GenStrings {
         let sortedStrings = localizableStrings.sort({ $0 < $1 })
         var processedStrings = String()
         for string in sortedStrings {
-            processedStrings.appendContentsOf("\"\(string)\" = \"\(string)\"; \n")
+            processedStrings.append(contentsOf: "\"\(string)\" = \"\(string)\"; \n")
         }
         print(processedStrings)
     }
@@ -62,7 +62,7 @@ class GenStrings {
                 return currentPattern
             }
             catch {
-                throw GenstringsError.Error
+                throw GenstringsError.failed
             }
         }
     }
@@ -78,7 +78,7 @@ class GenStrings {
             return matches
         }
         catch {
-            throw GenstringsError.Error
+            throw GenstringsError.failed
         }
     }
     
@@ -95,7 +95,7 @@ class GenStrings {
                         if isDir {
                             if !excludedFolderNames.contains(lastPathComponent) {
                                 let dirFiles = fetchFilesInFolder(urlPath)
-                                files.appendContentsOf(dirFiles)
+                                files.append(contentsOf: dirFiles)
                             }
                         } else {
                             if acceptedFileExtensions.contains(pathExtension) && !excludedFileNames.contains(lastPathComponent)  {

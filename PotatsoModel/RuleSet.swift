@@ -8,7 +8,7 @@
 
 import RealmSwift
 
-public enum RuleSetError: ErrorType {
+public enum RuleSetError: Error {
     case InvalidRuleSet
     case EmptyName
     case NameAlreadyExists
@@ -32,7 +32,7 @@ extension RuleSetError: CustomStringConvertible {
 public final class RuleSet: BaseModel {
     public dynamic var editable = true
     public dynamic var name = ""
-    public dynamic var remoteUpdatedAt: NSTimeInterval = NSDate().timeIntervalSince1970
+    public dynamic var remoteUpdatedAt: TimeInterval = Date().timeIntervalSince1970
     public dynamic var desc = ""
     public dynamic var ruleCount = 0
     public dynamic var rulesJSON = ""
@@ -58,17 +58,17 @@ public final class RuleSet: BaseModel {
     }
 
     public override func validate(inRealm realm: Realm) throws {
-        guard name.characters.count > 0 else {
+        guard name.count > 0 else {
             throw RuleSetError.EmptyName
         }
     }
 
     private func updateCahcedRules() {
-        guard let jsonArray = rulesJSON.jsonArray() as? [[String: AnyObject]] else {
+        guard let jsonArray = rulesJSON.jsonArray() as? [[String: Any]] else {
             cachedRules = []
             return
         }
-        cachedRules = jsonArray.flatMap({ Rule(json: $0) })
+        cachedRules = jsonArray.compactMap({ Rule(json: $0) })
     }
 
     public func addRule(rule: Rule) {
@@ -79,21 +79,21 @@ public final class RuleSet: BaseModel {
 
     public func insertRule(rule: Rule, atIndex index: Int) {
         var newRules = rules
-        newRules.insert(rule, atIndex: index)
+        newRules.insert(rule, at: index)
         rules = newRules
     }
 
     public func removeRule(atIndex index: Int) {
         var newRules = rules
-        newRules.removeAtIndex(index)
+        newRules.remove(at: index)
         rules = newRules
     }
 
     public func move(fromIndex: Int, toIndex: Int) {
         var newRules = rules
         let rule = newRules[fromIndex]
-        newRules.removeAtIndex(fromIndex)
-        insertRule(rule, atIndex: toIndex)
+        newRules.remove(at: fromIndex)
+        insertRule(rule: rule, atIndex: toIndex)
         rules = newRules
     }
 }
@@ -108,14 +108,14 @@ extension RuleSet {
 
 extension RuleSet {
     
-    public convenience init(dictionary: [String: AnyObject], inRealm realm: Realm) throws {
+    public convenience init(dictionary: [String: Any], inRealm realm: Realm) throws {
         self.init()
         guard let name = dictionary["name"] as? String else {
             throw RuleSetError.InvalidRuleSet
         }
         self.name = name
-        if realm.objects(RuleSet).filter("name = '\(name)'").first != nil {
-            self.name = "\(name) \(RuleSet.dateFormatter.stringFromDate(NSDate()))"
+        if realm.objects(RuleSet.self).filter("name = '\(name)'").first != nil {
+            self.name = "\(name) \(RuleSet.dateFormatter.string(from: Date()))"
         }
         guard let rulesStr = dictionary["rules"] as? [String] else {
             throw RuleSetError.InvalidRuleSet

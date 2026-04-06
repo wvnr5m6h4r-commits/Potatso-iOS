@@ -20,7 +20,7 @@ class ICloudSyncService: SyncServiceProtocol {
 
     }
 
-    func setup(completion: (ErrorType? -> Void)?) {
+    func setup(completion: ((Error?) -> Void)?) {
         DDLogInfo(">>>>>> Setuping iCloud sync service")
         let setupOp = ICloudSetupOperation { [weak self] (error) in
             if let e = error {
@@ -34,7 +34,7 @@ class ICloudSyncService: SyncServiceProtocol {
         operationQueue.addOperation(setupOp)
     }
 
-    func sync(manually: Bool = false, completion: (ErrorType? -> Void)?) {
+    func sync(manually: Bool = false, completion: ((Error?) -> Void)?) {
         DDLogInfo(">>>>>>>>>> iCloud sync start")
         if manually {
             DDLogWarn("Manually sync: clear token and mark all as not synced")
@@ -76,7 +76,7 @@ class ICloudSyncService: SyncServiceProtocol {
         }
     }
 
-    func finishSync(error: ErrorType?, completion: (ErrorType? -> Void)?) {
+    func finishSync(error: Error?, completion: ((Error?) -> Void)?) {
         if let error = error {
             DDLogInfo("<<<<<<<<<< iCloud sync finished with error: \(error)")
         } else {

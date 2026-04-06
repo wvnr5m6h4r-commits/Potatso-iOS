@@ -10,7 +10,6 @@ import Foundation
 import PotatsoModel
 import Cartography
 import ICSPullToRefresh
-import Async
 
 private let rowHeight: CGFloat = 120
 private let kRuleSetCellIdentifier = "ruleset"
@@ -34,33 +33,30 @@ class CloudViewController: UIViewController, UITableViewDataSource, UITableViewD
         if !loadMore {
             page = 0
         }
-        API.getRuleSets(page + 1, count: pageSize) { (response) in
+        API.getRuleSets(page: page + 1, count: pageSize) { result in
             defer {
                 self.tableView.pullToRefreshView?.stopAnimating()
                 self.tableView.infiniteScrollingView?.stopAnimating()
             }
-            if response.result.isFailure {
-                // Fail
-                let errDesc = response.result.error?.localizedDescription ?? ""
-                self.showTextHUD((errDesc.characters.count > 0 ? "\(errDesc)" : "Unkown error".localized()), dismissAfterDelay: 1.5)
-            }else {
-                guard let result = response.result.value else {
-                    return
-                }
+            switch result {
+            case .failure(let error):
+                let errDesc = error.localizedDescription
+                self.showTextHUD(errDesc.isEmpty ? "Unkown error".localized() : errDesc, dismissAfterDelay: 1.5)
+            case .success(let rows):
                 self.tableView.addInfiniteScrollingWithHandler({ [weak self] in
                     self?.loadData(isLoadMore: true)
                 })
-                self.tableView.setShowsInfiniteScrolling(result.count >= pageSize)
-                if result.count > 0 {
+                self.tableView.setShowsInfiniteScrolling(rows.count >= pageSize)
+                if rows.count > 0 {
                     self.page += 1
                 }
-                let data = result.filter({ $0.name.characters.count > 0})
+                let data = rows.filter({ $0.name.count > 0 })
                 if loadMore {
-                    self.ruleSets.appendContentsOf(data)
-                    if result.count < pageSize {
+                    self.ruleSets.append(contentsOf: data)
+                    if rows.count < pageSize {
                         self.showTextHUD("No more data".localized(), dismissAfterDelay: 1.0)
                     }
-                }else {
+                } else {
                     self.ruleSets = data
                 }
                 self.tableView.reloadData()
@@ -73,18 +69,18 @@ class CloudViewController: UIViewController, UITableViewDataSource, UITableViewD
         navigationController?.pushViewController(vc, animated: true)
     }
 
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return ruleSets.count
     }
 
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(kRuleSetCellIdentifier, forIndexPath: indexPath) as! RuleSetCell
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: kRuleSetCellIdentifier, for: indexPath) as! RuleSetCell
         cell.setRuleSet(ruleSets[indexPath.row])
         return cell
     }
 
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        tableView.deselectRowAtIndexPath(indexPath, animated: true)
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
         let vc = CloudDetailViewController(ruleSet: ruleSets[indexPath.row])
         navigationController?.pushViewController(vc, animated: true)
     }
@@ -98,9 +94,9 @@ class CloudViewController: UIViewController, UITableViewDataSource, UITableViewD
 
     override func loadView() {
         super.loadView()
-        view.backgroundColor = UIColor.clearColor()
+        view.backgroundColor = UIColor.clear
         view.addSubview(tableView)
-        tableView.registerClass(RuleSetCell.self, forCellReuseIdentifier: kRuleSetCellIdentifier)
+        tableView.register(RuleSetCell.self, forCellReuseIdentifier: kRuleSetCellIdentifier)
 
         constrain(tableView, view) { tableView, view in
             tableView.edges == view.edges
@@ -108,15 +104,15 @@ class CloudViewController: UIViewController, UITableViewDataSource, UITableViewD
     }
 
     lazy var tableView: UITableView = {
-        let v = UITableView(frame: CGRect.zero, style: .Plain)
+        let v = UITableView(frame: CGRect.zero, style: .plain)
         v.dataSource = self
         v.delegate = self
         v.tableFooterView = UIView()
         v.tableHeaderView = UIView()
-        v.separatorStyle = .SingleLine
-        v.rowHeight = UITableViewAutomaticDimension
+        v.separatorStyle = .singleLine
+        v.rowHeight = UITableView.automaticDimension
         v.estimatedRowHeight = rowHeight
         return v
     }()
-    
+
 }

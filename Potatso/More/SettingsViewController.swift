@@ -142,15 +142,15 @@ class SettingsViewController: FormViewController, MFMailComposeViewControllerDel
     }
 
     func followTwitter() {
-        UIApplication.sharedApplication().openURL(NSURL(string: "https://twitter.com/intent/user?screen_name=potatsoapp")!)
+        UIApplication.shared.openURL(NSURL(string: "https://twitter.com/intent/user?screen_name=potatsoapp")!)
     }
 
     func followWeibo() {
-        UIApplication.sharedApplication().openURL(NSURL(string: "http://weibo.com/potatso")!)
+        UIApplication.shared.openURL(NSURL(string: "http://weibo.com/potatso")!)
     }
 
     func joinTelegramGroup() {
-        UIApplication.sharedApplication().openURL(NSURL(string: "https://telegram.me/joinchat/BT0c4z49OGNZXwl9VsO0uQ")!)
+        UIApplication.shared.openURL(NSURL(string: "https://telegram.me/joinchat/BT0c4z49OGNZXwl9VsO0uQ")!)
     }
 
     func shareWithFriends() {

@@ -25,8 +25,8 @@ class ConfigGroupChooseManager {
 
     func show() {
         if window == nil {
-            window = ConfigGroupChooseWindow(frame: UIScreen.mainScreen().bounds)
-            window?.backgroundColor = UIColor.clearColor()
+            window = ConfigGroupChooseWindow(frame: UIScreen.main.bounds)
+            window?.backgroundColor = UIColor.clear
             window?.makeKeyAndVisible()
             window?.chooseVC.view.frame = CGRect(x: 0, y: window!.frame.height, width: window!.frame.width, height: window!.frame.height)
             UIView.animateWithDuration(0.3) {
@@ -65,7 +65,7 @@ class ConfigGroupChooseWindow: UIWindow {
     }
 
     func onStatusBarFrameChange() {
-        frame = UIScreen.mainScreen().bounds
+        frame = UIScreen.main.bounds
     }
 
 }
@@ -194,7 +194,7 @@ class ConfigGroupChooseVC: UIViewController, UITableViewDataSource, UITableViewD
 
     override func loadView() {
         super.loadView()
-        view.backgroundColor = UIColor.clearColor()
+        view.backgroundColor = UIColor.clear
         gesture = UITapGestureRecognizer(target: self, action: #selector(onTap))
         gesture?.delegate = self
         view.addGestureRecognizer(gesture!)

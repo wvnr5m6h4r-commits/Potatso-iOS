@@ -90,7 +90,7 @@ class HomePresenter: NSObject {
 
     func addEmptyConfigGroup(name: String) throws {
         let trimmedName = name.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
-        if trimmedName.characters.count == 0 {
+        if trimmedName.count == 0 {
             throw "Name can't be empty".localized()
         }
         let group = ConfigurationGroup()
@@ -128,8 +128,8 @@ class HomePresenter: NSObject {
     func updateDNS(dnsString: String) {
         var dns: String = ""
         let trimmedDNSString = dnsString.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
-        if trimmedDNSString.characters.count > 0 {
-            let dnsArray = dnsString.componentsSeparatedByString(",").map({ $0.componentsSeparatedByString("，") }).flatMap({ $0 }).map({ $0.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())}).filter({ $0.characters.count > 0 })
+        if trimmedDNSString.count > 0 {
+            let dnsArray = dnsString.componentsSeparatedByString(",").map({ $0.componentsSeparatedByString("，") }).flatMap({ $0 }).map({ $0.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())}).filter({ $0.count > 0 })
             let ipRegex = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$";
             guard let regex = try? Regex(ipRegex) else {
                 fatalError()
@@ -140,7 +140,7 @@ class HomePresenter: NSObject {
                 dns = ""
                 Alert.show(self.vc, title: "Invalid DNS".localized(), message: "DNS should be valid ip addresses (separated by commas if multiple). e.g.: 8.8.8.8,8.8.4.4".localized())
             }else {
-                dns = dnsArray.joinWithSeparator(",")
+                dns = dnsArray.joined(separator:",")
             }
         }
         do {

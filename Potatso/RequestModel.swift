@@ -90,7 +90,7 @@ extension HTTPResponseCode: CustomStringConvertible {
         case 500..<600:
             return "000000".color
         default:
-            return UIColor.blackColor()
+            return UIColor.black
         }
     }
     

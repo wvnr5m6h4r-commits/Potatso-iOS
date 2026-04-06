@@ -63,7 +63,7 @@ class PotatsoLibraryTests: XCTestCase {
                 "  type: shadowsocks",
                 "  host: 10.0.0.0",
                 "  port: 9000",
-                "  encryption: rc4-md5"].joinWithSeparator("\n"))
+                "  encryption: rc4-md5"].joined(separator:"\n"))
             assert(false)
         }catch ProxyError.InvalidPassword {
             
@@ -84,7 +84,7 @@ class PotatsoLibraryTests: XCTestCase {
                 "  host: 10.0.0.0",
                 "  port: 9000",
                 "  encryption: rc4-md5",
-                "  password: 12345"].joinWithSeparator("\n"))
+                "  password: 12345"].joined(separator:"\n"))
             assert(config.proxies.count == 1)
             let proxy = config.proxies[0]
             assert(proxy.name == "vultr")
@@ -116,7 +116,7 @@ class PotatsoLibraryTests: XCTestCase {
                 "  host: 10.0.0.0",
                 "  port: 9000",
                 "  encryption: rc4-md5",
-                "  password: 12345"].joinWithSeparator("\n"))
+                "  password: 12345"].joined(separator:"\n"))
             assert(config.proxies.count == 2)
         }catch {
             assert(false)
@@ -141,7 +141,7 @@ class PotatsoLibraryTests: XCTestCase {
                 "  host: 10.0.0.0",
                 "  port: 9000",
                 "  encryption: rc4-md5",
-                "  password: 12345"].joinWithSeparator("\n"))
+                "  password: 12345"].joined(separator:"\n"))
             assert(false)
         }catch ProxyError.NameAlreadyExists {
             
@@ -158,7 +158,7 @@ class PotatsoLibraryTests: XCTestCase {
             try config.setup(string: [
                 "proxies:\n",
                 "- name: vultr",
-                "  uri: ss://salsa20:%%%%$$$:@@10.0.0.0:443"].joinWithSeparator("\n"))
+                "  uri: ss://salsa20:%%%%$$$:@@10.0.0.0:443"].joined(separator:"\n"))
             assert(config.proxies.count == 1)
             let proxy = config.proxies[0]
             assert(proxy.name == "vultr")
@@ -180,7 +180,7 @@ class PotatsoLibraryTests: XCTestCase {
             try config.setup(string: [
                 "proxies:\n",
                 "- name: vultr",
-                "  uri: ss://salsa20:%%%%$$$:@@10.0.0.0"].joinWithSeparator("\n"))
+                "  uri: ss://salsa20:%%%%$$$:@@10.0.0.0"].joined(separator:"\n"))
             assert(false)
         }catch {
         }

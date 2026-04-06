@@ -56,7 +56,7 @@ class CurrentGroupCell: UITableViewCell {
     lazy var nameLabel: UILabel = {
         let v = UILabel()
         v.font = UIFont.boldSystemFontOfSize(17)
-        v.textColor = UIColor.whiteColor()
+        v.textColor = UIColor.white
         return v
     }()
     

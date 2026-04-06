@@ -23,7 +23,7 @@ class RequestDetailBaseCell: UITableViewCell, RequestDetailCell {
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        backgroundColor = UIColor.clearColor()
+        backgroundColor = UIColor.clear
         contentView.addSubview(leftCircleView)
         contentView.addSubview(timeLabel)
         contentView.addSubview(backgroundWrapper)
@@ -108,7 +108,7 @@ class RequestDetailRawTextCell: RequestDetailBaseCell {
             pStyle.lineBreakMode = .ByCharWrapping
             attr.addAttributes([NSParagraphStyleAttributeName: pStyle], range: NSRange(location: 0, length: attr.length))
             titleLabel.attributedText = attr
-            let size = attr.boundingRectWithSize(CGSize(width: UIScreen.mainScreen().bounds.width - 51, height: 10000), options: NSStringDrawingOptions.UsesLineFragmentOrigin, context: nil)
+            let size = attr.boundingRectWithSize(CGSize(width: UIScreen.main.bounds.width - 51, height: 10000), options: NSStringDrawingOptions.UsesLineFragmentOrigin, context: nil)
             constrain(titleLabel, backgroundWrapper, replace: group) { titleLabel, backgroundWrapper in
                 titleLabel.height == ceil(size.height)
                 titleLabel.edges == inset(backgroundWrapper.edges, 10)

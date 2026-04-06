@@ -8,7 +8,7 @@
 
 import RealmSwift
 
-public enum ConfigurationGroupError: ErrorType {
+public enum ConfigurationGroupError: Error {
     case InvalidConfigurationGroup
     case EmptyName
     case NameAlreadyExists
@@ -43,7 +43,7 @@ public class ConfigurationGroup: BaseModel {
     }
     
     public override func validate(inRealm realm: Realm) throws {
-        guard name.characters.count > 0 else {
+        guard name.count > 0 else {
             throw ConfigurationGroupError.EmptyName
         }
     }
@@ -55,22 +55,22 @@ public class ConfigurationGroup: BaseModel {
 
 extension ConfigurationGroup {
     
-    public convenience init(dictionary: [String: AnyObject], inRealm realm: Realm) throws {
+    public convenience init(dictionary: [String: Any], inRealm realm: Realm) throws {
         self.init()
         guard let name = dictionary["name"] as? String else {
             throw ConfigurationGroupError.InvalidConfigurationGroup
         }
         self.name = name
-        if realm.objects(RuleSet).filter("name = '\(name)'").first != nil {
-            self.name = "\(name) \(ConfigurationGroup.dateFormatter.stringFromDate(NSDate()))"
+        if realm.objects(RuleSet.self).filter("name = '\(name)'").first != nil {
+            self.name = "\(name) \(ConfigurationGroup.dateFormatter.string(from: Date()))"
         }
-        if let proxyName = dictionary["proxy"] as? String, proxy = realm.objects(Proxy).filter("name = '\(proxyName)'").first {
+        if let proxyName = dictionary["proxy"] as? String, let proxy = realm.objects(Proxy.self).filter("name = '\(proxyName)'").first {
             self.proxies.removeAll()
             self.proxies.append(proxy)
         }
         if let ruleSetsName = dictionary["ruleSets"] as? [String] {
             for ruleSetName in ruleSetsName {
-                if let ruleSet = realm.objects(RuleSet).filter("name = '\(ruleSetName)'").first {
+                if let ruleSet = realm.objects(RuleSet.self).filter("name = '\(ruleSetName)'").first {
                     self.ruleSets.append(ruleSet)
                 }
             }
@@ -82,7 +82,7 @@ extension ConfigurationGroup {
             self.dns = dns
         }
         if let dns = dictionary["dns"] as? [String] {
-            self.dns = dns.joinWithSeparator(",")
+            self.dns = dns.joined(separator:",")
         }
     }
 

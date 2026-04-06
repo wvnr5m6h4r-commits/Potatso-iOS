@@ -85,7 +85,7 @@ class HomeVC: FormViewController, UINavigationControllerDelegate, HomePresenterP
 
     func updateConnectButton() {
         connectButton.enabled = [VPNStatus.On, VPNStatus.Off].contains(status)
-        connectButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
+        connectButton.setTitleColor(UIColor.white, forState: .Normal)
         switch status {
         case .Connecting, .Disconnecting:
             connectButton.animating = true
@@ -265,7 +265,7 @@ class HomeVC: FormViewController, UINavigationControllerDelegate, HomePresenterP
 
     lazy var titleButton: UIButton = {
         let b = UIButton(type: .Custom)
-        b.setTitleColor(UIColor.blackColor(), forState: .Normal)
+        b.setTitleColor(UIColor.black, forState: .Normal)
         b.addTarget(self, action: #selector(HomeVC.handleTitleButtonPressed), forControlEvents: .TouchUpInside)
         if let titleLabel = b.titleLabel {
             titleLabel.font = UIFont.boldSystemFontOfSize(titleLabel.font.pointSize)

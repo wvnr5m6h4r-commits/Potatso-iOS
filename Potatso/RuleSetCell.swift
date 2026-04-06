@@ -81,7 +81,7 @@ class RuleSetCell: UITableViewCell {
             bottomView = subscribeFlagLabel
         }else {
             subscribeFlagLabel.hidden = true
-            if ruleSet.desc.characters.count > 0 {
+            if ruleSet.desc.count > 0 {
                 bottomView = descLabel
             }else{
                 bottomView = countLabel
@@ -155,7 +155,7 @@ class RuleSetCell: UITableViewCell {
 
     lazy var subscribeFlagLabel: PaddingLabel = {
         let v = PaddingLabel()
-        v.textColor = UIColor.whiteColor()
+        v.textColor = UIColor.white
         v.font = UIFont.systemFontOfSize(10)
         v.padding = UIEdgeInsetsMake(3, 10, 3, 10)
         v.layer.cornerRadius = 3

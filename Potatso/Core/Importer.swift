@@ -114,7 +114,7 @@ struct Importer {
         }
     }
     
-    func onConfigSaveCallback(success: Bool, error: ErrorType?) {
+    func onConfigSaveCallback(success: Bool, error: Error?) {
         Async.main(after: 0.5) {
             self.viewController?.hideHUD()
             if !success {

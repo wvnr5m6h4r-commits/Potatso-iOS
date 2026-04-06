@@ -28,58 +28,49 @@ public struct LifeCycleKey {
 let appConfig = AppConfig.sharedConfig
 
 public class AppConfig {
-    
+
     public var lifeCycleConfig = [String: [AppLifeCycleItem]]()
-    public var customConfig = [String: AnyObject]()
-    
+    public var customConfig = [String: Any]()
+
     public class var sharedConfig: AppConfig {
         return sharedConfigInstance
     }
-    
+
     public func loadConfig(fileName: String) {
-        var components = fileName.componentsSeparatedByString(".")
+        var components = fileName.components(separatedBy: ".")
         let type = components.popLast()
-        let name = components.joinWithSeparator(".")
-        if let path = NSBundle.mainBundle().pathForResource(name, ofType: type) {
-            let configDict = NSDictionary(contentsOfFile: path) as! [String: AnyObject]
-            loadConfig(configDict)
+        let name = components.joined(separator: ".")
+        if let path = Bundle.main.path(forResource: name, ofType: type) {
+            if let configDict = NSDictionary(contentsOfFile: path) as? [String: Any] {
+                loadConfig(dictionary: configDict)
+            }
         }
     }
-    
-    public func loadConfig(dictionary: [String: AnyObject]) {
-        if let lifeCycleDict = dictionary[ConfigKey.lifeCycle] as? [String: AnyObject] {
+
+    public func loadConfig(dictionary: [String: Any]) {
+        if let lifeCycleDict = dictionary[ConfigKey.lifeCycle] as? [String: Any] {
             loadLifeCycleConfig(lifeCycleDict)
         }
-        if let lifeCycleDict = dictionary[ConfigKey.custom] as? [String: AnyObject] {
+        if let lifeCycleDict = dictionary[ConfigKey.custom] as? [String: Any] {
             loadCustomConfig(lifeCycleDict)
         }
     }
-    
-    func loadLifeCycleConfig(dictionary: [String: AnyObject]) {
+
+    func loadLifeCycleConfig(dictionary: [String: Any]) {
         for (key, value) in dictionary {
             var items = [AppLifeCycleItem]()
-            if let itemArray = value as? [AnyObject] {
-                items = itemArray.map { AppLifeCycleItem(dictionary: $0 as! [String: AnyObject]) }.filter { $0 != nil }.map { $0! }
+            if let itemArray = value as? [Any] {
+                items = itemArray.compactMap { elt in
+                    guard let d = elt as? [String: Any] else { return nil }
+                    return AppLifeCycleItem(dictionary: d)
+                }
             }
             lifeCycleConfig[key] = items
         }
     }
-    
-    func loadCustomConfig(dictionary: [String: AnyObject]) {
+
+    func loadCustomConfig(dictionary: [String: Any]) {
         customConfig = dictionary
     }
-    
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

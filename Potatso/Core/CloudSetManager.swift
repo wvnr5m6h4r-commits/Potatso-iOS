@@ -21,17 +21,18 @@ class CloudSetManager {
     func update() {
         Async.background(after: 1.5) {
             let realm = try! Realm()
-            let uuids = realm.objects(RuleSet).filter("isSubscribe = true").map({$0.uuid})
-            API.updateRuleSetListDetail(uuids) { (response) in
-                if let sets = response.result.value {
+            let uuids = realm.objects(RuleSet.self).filter("isSubscribe = true").map({ $0.uuid })
+            API.updateRuleSetListDetail(uuids: Array(uuids)) { result in
+                switch result {
+                case .success(let sets):
                     do {
-                        try RuleSet.addRemoteArray(sets)
-                    }catch {
-                        error.log("Unable to save updated rulesets")
+                        try RuleSet.addRemoteArray(rulesets: sets)
+                    } catch {
+                        error.log(message: "Unable to save updated rulesets")
                         return
                     }
-                }else {
-                    response.result.error?.log("Fail to update ruleset details")
+                case .failure(let error):
+                    error.log(message: "Fail to update ruleset details")
                 }
             }
         }

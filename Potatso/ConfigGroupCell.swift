@@ -32,7 +32,7 @@ class ConfigGroupCell: UITableViewCell {
         ruleSetsHintLabel.text = "Rule Set".localized()
         let desc = group.ruleSets.map { (set) -> String in
             return set.name
-        }.joinWithSeparator(", ")
+        }.joined(separator:", ")
         ruleSetsLabel.text = group.ruleSets.count > 0 ? "\(desc)" : "None".localized()
         leftColorHintView.backgroundColor = hintColor
         statusLabel.hidden = true
@@ -43,7 +43,7 @@ class ConfigGroupCell: UITableViewCell {
     
     func loadView() {
         selectionStyle = .None
-        backgroundColor = UIColor.clearColor()
+        backgroundColor = UIColor.clear
         contentView.addSubview(backgroundWrapper)
         backgroundWrapper.addSubview(leftColorHintView)
         backgroundWrapper.addSubview(statusLabel)
@@ -143,7 +143,7 @@ class ConfigGroupCell: UITableViewCell {
         let v = UILabel()
         v.text = "Connected".localized()
         v.font = UIFont.systemFontOfSize(10)
-        v.textColor = UIColor.whiteColor()
+        v.textColor = UIColor.white
         v.layer.cornerRadius = 10
         v.layer.masksToBounds = true
         v.backgroundColor = "1ABC9C".color
@@ -161,7 +161,7 @@ class ConfigGroupCell: UITableViewCell {
     
     lazy var backgroundWrapper: UIView = {
         let v = UIView()
-        v.backgroundColor = UIColor.whiteColor()
+        v.backgroundColor = UIColor.white
         return v
     }()
     

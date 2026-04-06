@@ -99,7 +99,7 @@ class RuleConfigurationViewController: FormViewController {
             guard let type = values[kRuleFormType] as? RuleType else {
                 throw "You must choose a type".localized()
             }
-            guard let value = (values[kRuleFormValue] as? String)?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet()) where value.characters.count > 0 else {
+            guard let value = (values[kRuleFormValue] as? String)?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet()) where value.count > 0 else {
                 throw "Value can't be empty".localized()
             }
             guard let action = values[kRuleFormAction] as? RuleAction else {

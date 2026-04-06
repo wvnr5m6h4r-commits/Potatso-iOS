@@ -117,8 +117,8 @@ extension ConfigurationGroup: CloudKitRecord {
         for key in ConfigurationGroup.keys {
             record.setValue(self.valueForKey(key), forKey: key)
         }
-        record["proxies"] = proxies.map({ $0.uuid }).joinWithSeparator(",")
-        record["ruleSets"] = ruleSets.map({ $0.uuid }).joinWithSeparator(",")
+        record["proxies"] = proxies.map({ $0.uuid }).joined(separator:",")
+        record["ruleSets"] = ruleSets.map({ $0.uuid }).joined(separator:",")
         return record
     }
 
@@ -133,12 +133,12 @@ extension ConfigurationGroup: CloudKitRecord {
         if let rulesUUIDs = record["proxies"] as? String {
             let uuids = rulesUUIDs.componentsSeparatedByString(",")
             let rules = uuids.flatMap({ realm.objects(Proxy).filter("uuid = '\($0)'").first })
-            group.proxies.appendContentsOf(rules)
+            group.proxies.append(contentsOf: rules)
         }
         if let rulesUUIDs = record["ruleSets"] as? String {
             let uuids = rulesUUIDs.componentsSeparatedByString(",")
             let rules = uuids.flatMap({ realm.objects(RuleSet).filter("uuid = '\($0)'").first })
-            group.ruleSets.appendContentsOf(rules)
+            group.ruleSets.append(contentsOf: rules)
         }
         return group
     }

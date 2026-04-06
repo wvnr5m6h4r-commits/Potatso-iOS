@@ -19,7 +19,7 @@ class Regex {
     }
 
     func test(input: String) -> Bool {
-        let matches = self.internalExpression.matchesInString(input, options: NSMatchingOptions.ReportCompletion, range:NSMakeRange(0, input.characters.count))
+        let matches = self.internalExpression.matchesInString(input, options: NSMatchingOptions.ReportCompletion, range:NSMakeRange(0, input.count))
         return matches.count > 0
     }
 

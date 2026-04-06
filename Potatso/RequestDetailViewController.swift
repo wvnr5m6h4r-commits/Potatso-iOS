@@ -91,7 +91,7 @@ class RequestDetailViewController: UIViewController, UITableViewDataSource, UITa
         v.separatorStyle = .None
         v.estimatedRowHeight = 110
         v.rowHeight = UITableViewAutomaticDimension
-        v.backgroundColor = UIColor.clearColor()
+        v.backgroundColor = UIColor.clear
         return v
     }()
     

@@ -13,7 +13,7 @@ import Async
 
 class ICloudSetupOperation: GroupOperation {
 
-    init(completion: (ErrorType? -> Void)? = nil) {
+    init(completion: ((Error?) -> Void)? = nil) {
         let url = NSURL(string: "http://www.apple.com")!
         let reachabilityCondition = ReachabilityCondition(host: url)
 

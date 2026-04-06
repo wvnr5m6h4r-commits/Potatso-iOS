@@ -139,7 +139,7 @@ extension DBUtils {
         return res.first
     }
 
-    public static func modify<T: BaseModel>(type: T.Type, id: String, inRealm realm: Realm? = nil, modifyBlock: ((Realm, T) -> ErrorType?)) throws {
+    public static func modify<T: BaseModel>(type: T.Type, id: String, inRealm realm: Realm? = nil, modifyBlock: ((Realm, T) -> Error?)) throws {
         let mRealm = currentRealm(realm)
         guard let object: T = DBUtils.get(id, type: type, inRealm: mRealm) else {
             return
@@ -170,9 +170,9 @@ extension DBUtils {
         let rulesets = mRealm.objects(RuleSet.self).filter(filter).map({ $0 })
         let groups = mRealm.objects(ConfigurationGroup.self).filter(filter).map({ $0 })
         var objects: [BaseModel] = []
-        objects.appendContentsOf(proxies as [BaseModel])
-        objects.appendContentsOf(rulesets as [BaseModel])
-        objects.appendContentsOf(groups as [BaseModel])
+        objects.append(contentsOf: proxies as [BaseModel])
+        objects.append(contentsOf: rulesets as [BaseModel])
+        objects.append(contentsOf: groups as [BaseModel])
         return objects
     }
 
@@ -183,9 +183,9 @@ extension DBUtils {
         let rulesets = mRealm.objects(RuleSet.self).filter(filter).map({ $0 })
         let groups = mRealm.objects(ConfigurationGroup.self).filter(filter).map({ $0 })
         var objects: [BaseModel] = []
-        objects.appendContentsOf(proxies as [BaseModel])
-        objects.appendContentsOf(rulesets as [BaseModel])
-        objects.appendContentsOf(groups as [BaseModel])
+        objects.append(contentsOf: proxies as [BaseModel])
+        objects.append(contentsOf: rulesets as [BaseModel])
+        objects.append(contentsOf: groups as [BaseModel])
         return objects
     }
 }
@@ -194,7 +194,7 @@ extension DBUtils {
 extension BaseModel {
 
     func setModified() {
-        updatedAt = NSDate().timeIntervalSince1970
+        updatedAt = Date().timeIntervalSince1970
         synced = false
     }
 
@@ -205,7 +205,7 @@ extension BaseModel {
 extension ConfigurationGroup {
 
     public static func changeProxy(forGroupId groupId: String, proxyId: String?) throws {
-        try DBUtils.modify(ConfigurationGroup.self, id: groupId) { (realm, group) -> ErrorType? in
+        try DBUtils.modify(ConfigurationGroup.self, id: groupId) { (realm, group) -> Error? in
             group.proxies.removeAll()
             if let proxyId = proxyId, proxy = DBUtils.get(proxyId, type: Proxy.self, inRealm: realm){
                 group.proxies.append(proxy)
@@ -215,7 +215,7 @@ extension ConfigurationGroup {
     }
 
     public static func appendRuleSet(forGroupId groupId: String, rulesetId: String) throws {
-        try DBUtils.modify(ConfigurationGroup.self, id: groupId) { (realm, group) -> ErrorType? in
+        try DBUtils.modify(ConfigurationGroup.self, id: groupId) { (realm, group) -> Error? in
             if let ruleset = DBUtils.get(rulesetId, type: RuleSet.self, inRealm: realm) {
                 group.ruleSets.append(ruleset)
             }
@@ -224,14 +224,14 @@ extension ConfigurationGroup {
     }
 
     public static func changeDNS(forGroupId groupId: String, dns: String?) throws {
-        try DBUtils.modify(ConfigurationGroup.self, id: groupId) { (realm, group) -> ErrorType? in
+        try DBUtils.modify(ConfigurationGroup.self, id: groupId) { (realm, group) -> Error? in
             group.dns = dns ?? ""
             return nil
         }
     }
 
     public static func changeName(forGroupId groupId: String, name: String) throws {
-        try DBUtils.modify(ConfigurationGroup.self, id: groupId) { (realm, group) -> ErrorType? in
+        try DBUtils.modify(ConfigurationGroup.self, id: groupId) { (realm, group) -> Error? in
             group.name = name
             return nil
         }
